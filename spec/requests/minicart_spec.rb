@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 feature "minicart", :js => true do
-  background { @product = create(:product, :name => "ror mug", :price => 30) }
+  background { @product = FactoryGirl.create(:product, :name => "ror mug", :price => 30, :on_hand => 2) }
 
   scenario "customer should be able to add and delete a product in the minicart" do
     visit spree.products_path
@@ -105,11 +105,7 @@ feature "minicart", :js => true do
     reset_spree_preferences do |config|
       config[:allow_backorders] = false
     end
-
-    item = @product.master.stock_items.first
-    item.update_column :count_on_hand, 1
-    item.backorderable = false
-    item.save!
+    @product.master.update_column :count_on_hand, 1
 
     visit spree.products_path
     click_link("ror mug")
